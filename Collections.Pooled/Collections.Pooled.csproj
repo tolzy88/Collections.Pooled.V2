@@ -4,6 +4,7 @@
 	<TargetFramework>netstandard2.1</TargetFramework>
 	<LangVersion>Latest</LangVersion>
 	<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+	<EnableUnsafeBinaryFormatterSerialization>true</EnableUnsafeBinaryFormatterSerialization>
 </PropertyGroup>
 
 <PropertyGroup Condition="'$(Configuration)'=='Debug'">
@@ -23,7 +24,7 @@
 	<AssemblyTitle>Collections.Pooled.V2</AssemblyTitle>
 	<AssemblyVersion>2.0.0.0</AssemblyVersion>
 	<FileVersion>2.0.0.0</FileVersion>
-	<Version>2.0.0.0</Version>
+	<Version>2.0.1</Version>
 	<Authors>viewpoint3450, jtmueller</Authors>
 	<Company />
 	<Description>Fast, low-allocation ports of List, Dictionary, HashSet, Stack, and Queue using ArrayPool and Span.</Description>

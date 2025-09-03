@@ -5,6 +5,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
@@ -591,6 +592,27 @@ namespace Collections.Pooled.Tests
                 Assert.Equal(firstValues[key], secondValues[key]);
         }
 
+        // .NET 8.0 introduced a change in the enumerator returned from a ReadOnlyCollection<T> when
+        // the underling list is empty. Now it returns SZGenericArrayEnumerator which will throw an
+        // InvalidOperattionException when accessing current before enumeration starts and after it has completed
+        // https://source.dot.net/System.Private.CoreLib/R/f7a38d1d13a03244.html 
+        // Credit jshergal - https://github.com/jshergal/Collections.Pooled/tree/SupportDotNet6_7_8
+#if NET8_0_OR_GREATER
+        [Theory]
+        [MemberData(nameof(ValidCollectionSizes))]
+        public void IEnumerable_Generic_Enumerator_Current_BeforeFirstMoveNext_UndefinedBehavior(int count)
+        {
+            T current;
+            IEnumerable<T> enumerable = GenericIEnumerableFactory(count);
+            using (IEnumerator<T> enumerator = enumerable.GetEnumerator())
+            {
+                if (Enumerator_Current_UndefinedOperation_Throws || (count == 0 && enumerable is ReadOnlyCollection<T>))
+                    Assert.Throws<InvalidOperationException>(() => enumerator.Current);
+                else
+                    current = enumerator.Current;
+            }
+        }
+#else
         [Theory]
         [MemberData(nameof(ValidCollectionSizes))]
         public void IEnumerable_Generic_Enumerator_Current_BeforeFirstMoveNext_UndefinedBehavior(int count)
@@ -605,7 +627,30 @@ namespace Collections.Pooled.Tests
                     current = enumerator.Current;
             }
         }
+#endif
 
+        // .NET 8.0 introduced a change in the enumerator returned from a ReadOnlyCollection<T> when
+        // the underling list is empty. Now it returns SZGenericArrayEnumerator which will throw an
+        // InvalidOperattionException when accessing current before enumeration starts and after it has completed
+        // https://source.dot.net/System.Private.CoreLib/R/f7a38d1d13a03244.html 
+        // Credit jshergal - https://github.com/jshergal/Collections.Pooled/tree/SupportDotNet6_7_8
+#if NET8_0_OR_GREATER
+        [Theory]
+        [MemberData(nameof(ValidCollectionSizes))]
+        public void IEnumerable_Generic_Enumerator_Current_AfterEndOfEnumerable_UndefinedBehavior(int count)
+        {
+            T current;
+            IEnumerable<T> enumerable = GenericIEnumerableFactory(count);
+            using (IEnumerator<T> enumerator = enumerable.GetEnumerator())
+            {
+                while (enumerator.MoveNext()) ;
+                if (Enumerator_Current_UndefinedOperation_Throws || (count == 0 && enumerable is ReadOnlyCollection<T>))
+                    Assert.Throws<InvalidOperationException>(() => enumerator.Current);
+                else
+                    current = enumerator.Current;
+            }
+        }
+#else
         [Theory]
         [MemberData(nameof(ValidCollectionSizes))]
         public void IEnumerable_Generic_Enumerator_Current_AfterEndOfEnumerable_UndefinedBehavior(int count)
@@ -621,6 +666,7 @@ namespace Collections.Pooled.Tests
                     current = enumerator.Current;
             }
         }
+#endif
 
         [Theory]
         [MemberData(nameof(ValidCollectionSizes))]
