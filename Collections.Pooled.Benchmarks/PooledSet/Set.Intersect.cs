@@ -1,13 +1,10 @@
 ﻿using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Jobs;
 using System.Collections.Generic;
 
 namespace Collections.Pooled.Benchmarks.PooledSet
 {
-#if NETCOREAPP2_2
-    [CoreJob]
-#elif NET472
-    [ClrJob]
-#endif
+    [SimpleJob(RuntimeMoniker.Net80)]
     [MemoryDiagnoser]
     public class Set_Intersect : SetBase
     {

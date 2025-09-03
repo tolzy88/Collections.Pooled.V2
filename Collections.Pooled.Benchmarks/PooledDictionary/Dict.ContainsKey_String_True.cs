@@ -2,14 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Jobs;
 
 namespace Collections.Pooled.Benchmarks.PooledDictionary
 {
-#if NETCOREAPP2_2
-    [CoreJob]
-#elif NET472
-    [ClrJob]
-#endif
+    [SimpleJob(RuntimeMoniker.Net80)]
     public class Dict_ContainsKey_String_True : DictContainsBase<string>
     {
         [Benchmark(Baseline = true)]

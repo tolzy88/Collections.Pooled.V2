@@ -1,14 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Jobs;
 
 namespace Collections.Pooled.Benchmarks.PooledDictionary
 {
-#if NETCOREAPP2_2
-    [CoreJob]
-#elif NET472
-    [ClrJob]
-#endif
+    [SimpleJob(RuntimeMoniker.Net80)]
     [MemoryDiagnoser]
     public class Dict_Add : DictBase
     {

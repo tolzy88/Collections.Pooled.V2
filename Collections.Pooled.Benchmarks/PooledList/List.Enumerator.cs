@@ -1,14 +1,11 @@
-﻿using System;
+﻿using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Jobs;
+using System;
 using System.Collections.Generic;
-using BenchmarkDotNet.Attributes;
 
 namespace Collections.Pooled.Benchmarks.PooledList
 {
-#if NETCOREAPP2_2
-    [CoreJob]
-#elif NET472
-    [ClrJob]
-#endif
+    [SimpleJob(RuntimeMoniker.Net80)]
     [MemoryDiagnoser]
     public class List_Enumerator : ListBase
     {

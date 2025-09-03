@@ -15,12 +15,7 @@ namespace Collections.Pooled.Benchmarks.PooledDictionary
             while (dict.Count < size)
             {
                 int key = rand.Next(500000, int.MaxValue);
-#if NETCOREAPP2_2
                 dict.TryAdd(key, 0);
-#else
-                if (!dict.ContainsKey(key))
-                    dict.Add(key, 0);
-#endif
             }
             return dict;
         }

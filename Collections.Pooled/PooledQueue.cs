@@ -646,12 +646,8 @@ namespace Collections.Pooled
 
         private static bool ShouldClear(ClearMode mode)
         {
-#if NETCOREAPP2_1
             return mode == ClearMode.Always
                 || (mode == ClearMode.Auto && RuntimeHelpers.IsReferenceOrContainsReferences<T>());
-#else
-            return mode != ClearMode.Never;
-#endif
         }
 
         public void Dispose()
