@@ -910,7 +910,9 @@ namespace Collections.Pooled.Tests
             if (!SupportsSerialization) return;
 
             IEnumerable<T> enumerable = GenericIEnumerableFactory(count);
+#pragma warning disable SYSLIB0011 // Type or member is obsolete
             var formatter = new BinaryFormatter();
+#pragma warning restore SYSLIB0011 // Type or member is obsolete
             using (var stream = new MemoryStream())
             {
                 formatter.Serialize(stream, enumerable);

@@ -1474,22 +1474,14 @@ namespace Collections.Pooled
 
         private static bool ShouldClearKey(ClearMode mode)
         {
-#if NETCOREAPP2_1
             return mode == ClearMode.Always
                 || (mode == ClearMode.Auto && RuntimeHelpers.IsReferenceOrContainsReferences<TKey>());
-#else
-            return mode != ClearMode.Never;
-#endif
         }
 
         private static bool ShouldClearValue(ClearMode mode)
         {
-#if NETCOREAPP2_1
             return mode == ClearMode.Always
                 || (mode == ClearMode.Auto && RuntimeHelpers.IsReferenceOrContainsReferences<TValue>());
-#else
-            return mode != ClearMode.Never;
-#endif
         }
 
         private static bool IsCompatibleKey(object key)

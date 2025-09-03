@@ -423,7 +423,6 @@ namespace Collections.Pooled.Tests.PooledSet
             Validate_ExceptWith(set, set);
         }
 
-#if !NET472
         [Theory]
         [MemberData(nameof(ValidCollectionSizes))]
         //[SkipOnTargetFramework(TargetFrameworkMonikers.NetFramework, "Full framework throws InvalidOperationException")]
@@ -432,7 +431,6 @@ namespace Collections.Pooled.Tests.PooledSet
             ISet<T> set = GenericISetFactory(setLength);
             Validate_IntersectWith(set, set);
         }
-#endif
 
         [Theory]
         [MemberData(nameof(ValidCollectionSizes))]
