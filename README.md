@@ -1,37 +1,35 @@
-# Collections.Pooled 
+# Collections.Pooled.V2
 
-| Master | Latest  |
-|--------|---------|
-| [![Build status](https://ci.appveyor.com/api/projects/status/vb6j2jon32ia5qq4/branch/master?svg=true)](https://ci.appveyor.com/project/jtmueller/collections-pooled/branch/master) | [![Build status](https://ci.appveyor.com/api/projects/status/vb6j2jon32ia5qq4?svg=true)](https://ci.appveyor.com/project/jtmueller/collections-pooled) |
+## About this fork
+
+The original project has not shown any signs of life for a while and is still targeting the very old .NET Core 2.1. I forked this repo and retargeted it to .NET Standard 2.1 since I will only be using it for new development in .NET Core projects. If it helps you - great! I'll do my best to try and respond to any issues/inquiries.
+
+## Info
 
 This library is based on classes from `System.Collections.Generic` that have been altered 
 to take advantage of the new `System.Span<T>` and `System.Buffers.ArrayPool<T>` libraries 
 to minimize memory allocations, improve performance, and/or allow greater interoperablity 
 with modern API's.
 
-Collections.Pooled supports both .NET Standard 2.0 (.NET Framework 4.6.1+) as well as an 
-optimized build for .NET Core 2.1+. An extensive set of unit tests and benchmarks have
+Collections.Pooled.V2 supports .NET Standard 2.1 (.NET Core 3.0+). An extensive set of unit tests and benchmarks have
 been ported from [corefx](https://github.com/dotnet/corefx).
 
 ```
-Total tests: 27501. Passed: 27501. Failed: 0. Skipped: 0.
-Test Run Successful.
-Test execution time: 9.9019 Seconds
+Collections.Pooled.Tests
+  Tests in group: 27437
+   Total Duration: 3.3 sec
+
+Outcomes
+   27437 Passed
 ```
 
 ## Installation
 
-[![NuGet Version](https://img.shields.io/nuget/v/Collections.Pooled.svg?style=flat)](https://www.nuget.org/packages/Collections.Pooled/) 
+[Available on NuGet!](https://www.nuget.org/packages/Collections.Pooled.V2)
 ```
-Install-Package Collections.Pooled
-dotnet add package Collections.Pooled
-paket add Collections.Pooled
+Install-Package Collections.Pooled.V2
+dotnet add package Collections.Pooled.V2
 ```
-
-## Benchmarks
-
-  * [.NET Core](https://github.com/jtmueller/Collections.Pooled/tree/master/docs/benchmarks/netcoreapp2.2)
-  * [.NET Framework](https://github.com/jtmueller/Collections.Pooled/tree/master/docs/benchmarks/net472)
 
 ## `PooledList<T>`
 
