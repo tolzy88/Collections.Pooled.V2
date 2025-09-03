@@ -24,13 +24,13 @@
 	<AssemblyTitle>Collections.Pooled.V2</AssemblyTitle>
 	<AssemblyVersion>2.0.0.0</AssemblyVersion>
 	<FileVersion>2.0.0.0</FileVersion>
-	<Version>2.0.1</Version>
-	<Authors>viewpoint3450, jtmueller</Authors>
+	<Version>2.0.2</Version>
+	<Authors>tolzy88, jtmueller</Authors>
 	<Company />
 	<Description>Fast, low-allocation ports of List, Dictionary, HashSet, Stack, and Queue using ArrayPool and Span.</Description>
 	<PackageTags>List ArrayPool Span Dictionary Stack Set HashSet Collections Pooled</PackageTags>
-	<PackageProjectUrl>https://github.com/viewpoint3450/Collections.Pooled.V2</PackageProjectUrl>
-	<RepositoryUrl>https://github.com/viewpoint3450/Collections.Pooled.V2.git</RepositoryUrl>
+	<PackageProjectUrl>https://github.com/tolzy88/Collections.Pooled.V2</PackageProjectUrl>
+	<RepositoryUrl>https://github.com/tolzy88/Collections.Pooled.V2.git</RepositoryUrl>
 	<RepositoryType>git</RepositoryType>
 	<PackageLicenseFile>LICENSE</PackageLicenseFile>
 	<PackageReadmeFile>README.md</PackageReadmeFile>
