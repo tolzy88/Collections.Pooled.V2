@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using Xunit;
 
@@ -956,15 +957,16 @@ namespace Collections.Pooled.Tests
             if (!SupportsSerialization) return;
 
             IEnumerable<T> enumerable = GenericIEnumerableFactory(count);
-#pragma warning disable SYSLIB0011 // Type or member is obsolete
-            var formatter = new BinaryFormatter();
-#pragma warning restore SYSLIB0011 // Type or member is obsolete
+
+            // DataContractSerializer can preserve runtime type info if you pass the type
+            var serializer = new DataContractSerializer(typeof(IEnumerable<T>));
+
             using (var stream = new MemoryStream())
             {
-                formatter.Serialize(stream, enumerable);
+                serializer.WriteObject(stream, enumerable);
                 stream.Position = 0L;
 
-                var copy = (IEnumerable<T>)formatter.Deserialize(stream);
+                var copy = (IEnumerable<T>)serializer.ReadObject(stream);
 
                 Assert.NotSame(enumerable, copy);
                 Assert.Equal(enumerable.Count(), copy.Count());
