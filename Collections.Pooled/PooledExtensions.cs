@@ -331,5 +331,45 @@ namespace Collections.Pooled
             => new PooledQueue<T>(array.AsSpan());
 
         #endregion
+
+        #region PooledMemory
+
+        /// <summary>
+        /// Create an instance of PooledMemory from the given items.
+        /// </summary>
+        public static PooledMemory<T> ToPooledMemory<T>(this IEnumerable<T> items)
+            => new PooledMemory<T>(items);
+
+        /// <summary>
+        /// Create an instance of PooledMemory from the given items.
+        /// </summary>
+        public static PooledMemory<T> ToPooledMemory<T>(this T[] array)
+            => new PooledMemory<T>(array.AsSpan());
+
+        /// <summary>
+        /// Create an instance of PooledMemory from the given items.
+        /// </summary>
+        public static PooledMemory<T> ToPooledMemory<T>(this ReadOnlySpan<T> span)
+            => new PooledMemory<T>(span);
+
+        /// <summary>
+        /// Create an instance of PooledMemory from the given items.
+        /// </summary>
+        public static PooledMemory<T> ToPooledMemory<T>(this Span<T> span)
+            => new PooledMemory<T>(span);
+
+        /// <summary>
+        /// Create an instance of PooledMemory from the given items.
+        /// </summary>
+        public static PooledMemory<T> ToPooledMemory<T>(this ReadOnlyMemory<T> memory)
+            => new PooledMemory<T>(memory.Span);
+
+        /// <summary>
+        /// Create an instance of PooledMemory from the given items.
+        /// </summary>
+        public static PooledMemory<T> ToPooledMemory<T>(this Memory<T> memory)
+            => new PooledMemory<T>(memory.Span);
+
+        #endregion
     }
 }
