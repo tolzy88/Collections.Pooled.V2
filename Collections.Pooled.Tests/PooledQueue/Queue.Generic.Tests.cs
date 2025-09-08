@@ -2,6 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+#pragma warning disable xUnit1026 // Theory methods should use all of their parameters
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -281,3 +282,4 @@ namespace Collections.Pooled.Tests.PooledQueue
         #endregion
     }
 }
+#pragma warning restore xUnit1026 // Theory methods should use all of their parameters

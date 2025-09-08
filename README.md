@@ -164,3 +164,23 @@ modified to use ArrayPool for internal storage allocation.
 #### Performance
 
 ![Queue Enqueue Benchmarks](./docs/benchmarks/netcoreapp2.2/Queue_Enqueue.svg)
+
+## `PooledMemory<T>`
+
+`PooledMemory<T>` is an `IMemoryOwner<T>` implementation that uses `ArrayPool<T>` for internal storage.  
+Unlike directly renting from `ArrayPool<T>`, the exposed memory region is always constrained to **exactly the requested length** rather than the entire rented buffer.
+
+  * Provides `Memory<T>` and `Span<T>` views into the pooled buffer, with the logical length fixed to the requested count.
+  * Exposes an indexer (`this[int index]`) and implements `IEnumerable<T>` for simple element access.
+  * Multiple constructors are available:
+    - From a `count` (pre-allocated size).
+    - From a `ReadOnlySpan<T>` or `IEnumerable<T>` (copying contents).
+    - With optional `ClearMode` and/or a custom `ArrayPool<T>`.
+  * **PooledMemory implements IDisposable.** Disposing the instance returns the rented array to the pool.  
+    If not disposed, the array will eventually be collected by the GC, but you lose the pooling benefit.
+  * `ClearMode` allows you to control whether arrays are cleared before returning to the pool:
+    - `Always`: always clear.
+    - `Never`: never clear.
+    - `Auto`: clear only when `T` is a reference type or contains references.
+  * You can supply your own `ArrayPool<T>` implementation if you don’t want to use the shared global pool.
+

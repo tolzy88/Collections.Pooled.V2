@@ -24,7 +24,10 @@ namespace Collections.Pooled.Tests.PooledMemory
             var pool = new ProbePool<int>(Math.Max(1, count));
             using var pm = new Collections.Pooled.PooledMemory<int>(count, ClearMode.Never, pool);
 
-            Assert.True(pool.RentCalled);
+            if (count != 0) // Empty arrays are not rented from the pool
+            {
+                Assert.True(pool.RentCalled);
+            }
             Assert.Equal(count, pm.Count);
         }
 
@@ -32,14 +35,17 @@ namespace Collections.Pooled.Tests.PooledMemory
         [InlineData(0)]
         [InlineData(1)]
         [InlineData(9)]
-        public void Ctor_ReadOnlySpan_CustomPool_IsUsed(int length)
+        public void Ctor_Span_CustomPool_IsUsed(int length)
         {
             var data = Enumerable.Range(0, length).ToArray();
             var pool = new ProbePool<int>(Math.Max(1, length));
 
-            using var pm = new Collections.Pooled.PooledMemory<int>(enumerable: data, clearMode: ClearMode.Never, customPool: pool);
+            using var pm = new Collections.Pooled.PooledMemory<int>(data.AsSpan(), ClearMode.Never, pool);
 
-            Assert.True(pool.RentCalled);
+            if (length != 0) // Empty arrays are not rented from the pool
+            {
+                Assert.True(pool.RentCalled);
+            }
             Assert.Equal(data, pm.Span.ToArray());
         }
 

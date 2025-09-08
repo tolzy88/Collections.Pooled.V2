@@ -1,4 +1,4 @@
-//
+﻿//
 // Authors:
 //   Steven Tolzmann
 //
@@ -16,12 +16,14 @@ namespace Collections.Pooled
     /// <summary>
     /// Pooled <see cref="IMemoryOwner{T}"/> implementation that uses <see cref="ArrayPool{T}"/> as the backing store.
     /// The exposed Memory Region is constrained to exactly the requested length. This differs from default <see cref="ArrayPool{T}"/> or <see cref="MemoryManager{T}"/> behavior that may return an array with a length greater than requested.
-    /// Also exposes <see cref="IEnumerable{T}"/> and indexer for element access.
+    /// Also exposes <see cref="IEnumerable{T}"/>, <see cref="IReadOnlyList{T}"/>, and indexer for element access.
     /// See <see href="https://learn.microsoft.com/dotnet/api/system.buffers.imemoryowner-1"/> for more information on <see cref="IMemoryOwner{T}"/>.
     /// </summary>
     /// <typeparam name="T">Element type.</typeparam>
-    public class PooledMemory<T> : IMemoryOwner<T>, IEnumerable<T>, IDisposable
+    public class PooledMemory<T> : IMemoryOwner<T>, IEnumerable<T>, IReadOnlyList<T>, IDisposable
     {
+        private static readonly bool s_isReferenceOrContainsReferences = RuntimeHelpers.IsReferenceOrContainsReferences<T>();
+        private static readonly T[] s_emptyArray = Array.Empty<T>();
         private readonly ArrayPool<T> _pool;
         private readonly bool _clearOnFree;
         private T[] _array;
@@ -149,7 +151,7 @@ namespace Collections.Pooled
                 ThrowHelper.ThrowValueArgumentOutOfRange_NeedNonNegNumException();
             _pool = customPool ?? ArrayPool<T>.Shared;
             _clearOnFree = ShouldClear(clearMode);
-            _array = _pool.Rent(count);
+            _array = count == 0 ? s_emptyArray : _pool.Rent(count);
             Count = count;
         }
 
@@ -210,17 +212,24 @@ namespace Collections.Pooled
             int count = span.Length; // Can't be negative
             _pool = customPool ?? ArrayPool<T>.Shared;
             _clearOnFree = ShouldClear(clearMode);
-            _array = _pool.Rent(count);
-            Count = count;
-            try
+            if (count == 0)
             {
-                span.CopyTo(_array);
+                _array = s_emptyArray;
+                Count = 0;
             }
-            catch
+            else
             {
-                // If CopyTo throws, return the array to the pool before propagating the exception.
-                _pool.Return(_array, _clearOnFree);
-                throw;
+                _array = _pool.Rent(count);
+                Count = count;
+                try
+                {
+                    span.CopyTo(_array);
+                }
+                catch
+                {
+                    _pool.Return(_array, _clearOnFree);
+                    throw;
+                }
             }
         }
 
@@ -233,6 +242,21 @@ namespace Collections.Pooled
         /// <exception cref="ArgumentNullException"><paramref name="enumerable"/> is null.</exception>
         public PooledMemory(IEnumerable<T> enumerable)
             : this(enumerable, ClearMode.Auto, ArrayPool<T>.Shared)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PooledMemory{T}"/> class by copying the contents of the specified
+        /// <see cref="IEnumerable{T}"/> into a buffer rented from <see cref="ArrayPool{T}.Shared"/>.
+        /// </summary>
+        /// <param name="enumerable">The source sequence whose elements will be copied into the new memory block.</param>
+        /// <param name="suggestCapacity">
+        /// The suggested initial capacity when the size of <paramref name="enumerable"/> is not known.
+        /// </param>
+        /// <remarks>Uses <see cref="ClearMode.Auto"/> for clearing behavior.</remarks>
+        /// <exception cref="ArgumentNullException"><paramref name="enumerable"/> is null.</exception>
+        public PooledMemory(IEnumerable<T> enumerable, int suggestCapacity)
+            : this(enumerable, ClearMode.Auto, ArrayPool<T>.Shared, suggestCapacity)
         {
         }
 
@@ -279,8 +303,11 @@ namespace Collections.Pooled
         /// <param name="customPool">
         /// The pool to rent from. If null, <see cref="ArrayPool{T}.Shared"/> is used.
         /// </param>
+        /// <param name="suggestCapacity">
+        /// The suggested initial capacity when the size of <paramref name="enumerable"/> is not known.
+        /// </param>
         /// <exception cref="ArgumentNullException"><paramref name="enumerable"/> is null.</exception>
-        public PooledMemory(IEnumerable<T> enumerable, ClearMode clearMode, ArrayPool<T> customPool)
+        public PooledMemory(IEnumerable<T> enumerable, ClearMode clearMode, ArrayPool<T> customPool, int suggestCapacity = 4)
         {
             _pool = customPool ?? ArrayPool<T>.Shared;
             _clearOnFree = ShouldClear(clearMode);
@@ -294,17 +321,24 @@ namespace Collections.Pooled
                 case ICollection<T> c:
                 {
                     int count = c.Count;
-                    _array = _pool.Rent(count);
-                    Count = count;
-                    try
+                    if (count == 0)
                     {
-                        c.CopyTo(_array, 0);
+                        _array = s_emptyArray;
+                        Count = 0;
                     }
-                    catch
+                    else
                     {
-                        // If CopyTo throws, return the array to the pool before propagating the exception.
-                        _pool.Return(_array, _clearOnFree);
-                        throw;
+                        _array = _pool.Rent(count);
+                        Count = count;
+                        try
+                        {
+                            c.CopyTo(_array, 0);
+                        }
+                        catch
+                        {
+                            _pool.Return(_array, _clearOnFree);
+                            throw;
+                        }
                     }
                     break;
                 }
@@ -312,58 +346,74 @@ namespace Collections.Pooled
                 case IReadOnlyCollection<T> rc:
                 {
                     int count = rc.Count;
-                    _array = _pool.Rent(count);
-                    Count = count;
-                    int i = 0;
-                    foreach (var item in rc)
-                        _array[i++] = item;
+                    if (count == 0)
+                    {
+                        _array = s_emptyArray;
+                        Count = 0;
+                    }
+                    else
+                    {
+                        _array = _pool.Rent(count);
+                        Count = count;
+                        int i = 0;
+                        foreach (var item in rc)
+                            _array[i++] = item;
+                    }
                     break;
                 }
 
                 case System.Collections.ICollection nc:
                 {
                     int count = nc.Count;
-                    _array = _pool.Rent(count);
-                    Count = count;
-                    try
+                    if (count == 0)
                     {
-                        nc.CopyTo(_array, 0);
+                        _array = s_emptyArray;
+                        Count = 0;
                     }
-                    catch
+                    else
                     {
-                        // If CopyTo throws, return the array to the pool before propagating the exception.
-                        _pool.Return(_array, _clearOnFree);
-                        throw;
+                        _array = _pool.Rent(count);
+                        Count = count;
+                        try
+                        {
+                            nc.CopyTo(_array, 0);
+                        }
+                        catch
+                        {
+                            _pool.Return(_array, _clearOnFree);
+                            throw;
+                        }
                     }
                     break;
                 }
 
                 default:
                 {
-                    int capacity = 4; // Start small and grow as needed
-                    _array = _pool.Rent(capacity);
-                    // Rent may return a bigger array, that is OK
-                    capacity = _array.Length;
+                    // Non-optimal path, but should work for any IEnumerable<T>.
+                    // If suggestCapacity is accurate, only one array rent will be needed.
+                    if (suggestCapacity < 0)
+                    ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.capacity,
+                        ExceptionResource.ArgumentOutOfRange_NeedNonNegNum);
+
+                    _array = _pool.Rent(suggestCapacity);
+                    // Rent may return more than requested, update to actual length
+                    suggestCapacity = _array.Length;
 
                     int i = 0;
                     foreach (var item in enumerable)
                     {
-                        if (i == capacity)
+                        if (i == suggestCapacity)
                         {
-                            // Need more space -> double capacity
-                            int newCapacity = capacity * 2;
+                            int newCapacity = suggestCapacity * 2;
                             T[] newArray = _pool.Rent(newCapacity);
-                            // Rent may return a bigger array, that is OK
+                            // Rent may return more than requested, update to actual length
                             newCapacity = newArray.Length;
-
-                            // Copy over existing
-                            Array.Copy(_array, 0, newArray, 0, capacity);
-
-                            // Return old array
+                            // Copy old array to new and return old array to pool
+                            Array.Copy(_array, 0, newArray, 0, suggestCapacity);
                             _pool.Return(_array, _clearOnFree);
 
                             _array = newArray;
-                            capacity = newCapacity;
+                            suggestCapacity = newCapacity;
                         }
 
                         _array[i++] = item;
@@ -379,6 +429,7 @@ namespace Collections.Pooled
         /// Returns an enumerator that iterates through the collection.
         /// </summary>
         /// <returns>An enumerator that can be used to iterate through the collection.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Span<T>.Enumerator GetEnumerator() => Span.GetEnumerator(); // Span enumerator is a ref struct (fast!)
 
         /// <summary>
@@ -414,24 +465,21 @@ namespace Collections.Pooled
         {
             if (disposing)
             {
-                if (Interlocked.Exchange(ref _array, null) is T[] array)
+                if (Interlocked.Exchange(ref _array, null) is T[] array && array != s_emptyArray)
                 {
                     try
                     {
-                        _pool.Return(
-                            array: array,
-                            clearArray: _clearOnFree);
+                        _pool.Return(array, _clearOnFree);
                     }
                     catch (ArgumentException)
                     {
-                        // If the pool rejected the array, ignore and drop it.
+                        // ¯\_(ツ)_/¯
                     }
                 }
             }
-            // no unmanaged resources to free
         }
 
-        private static readonly bool s_isReferenceOrContainsReferences = RuntimeHelpers.IsReferenceOrContainsReferences<T>();
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static bool ShouldClear(ClearMode mode)
         {
             return mode == ClearMode.Always
