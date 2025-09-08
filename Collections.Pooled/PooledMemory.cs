@@ -14,11 +14,12 @@ using System.Threading;
 namespace Collections.Pooled
 {
     /// <summary>
-    /// Pooled memory owner that uses <see cref="ArrayPool{T}"/> as the backing store.
-    /// Length is fixed at construction time, and constrained to the requested length. This behavior is different than other implementations that may return a length greater than requested.
-    /// Exposes <see cref="IEnumerable{T}"/> and a simple indexer for element access.
+    /// Pooled <see cref="IMemoryOwner{T}"/> implementation that uses <see cref="ArrayPool{T}"/> as the backing store.
+    /// The exposed Memory Region is constrained to exactly the requested length. This differs from default <see cref="ArrayPool{T}"/> or <see cref="MemoryManager{T}"/> behavior that may return an array with a length greater than requested.
+    /// Also exposes <see cref="IEnumerable{T}"/> and indexer for element access.
+    /// See <see href="https://learn.microsoft.com/dotnet/api/system.buffers.imemoryowner-1"/> for more information on <see cref="IMemoryOwner{T}"/>.
     /// </summary>
-    /// <typeparam name="T">Type to pool</typeparam>
+    /// <typeparam name="T">Element type.</typeparam>
     public class PooledMemory<T> : IMemoryOwner<T>, IEnumerable<T>, IDisposable
     {
         private readonly ArrayPool<T> _pool;
@@ -26,7 +27,7 @@ namespace Collections.Pooled
         private T[] _array;
 
         /// <summary>
-        /// Gets the number of elements in the block of memory.
+        /// Gets the number of elements in this block of memory.
         /// </summary>
         public int Count { get; }
 
@@ -34,7 +35,7 @@ namespace Collections.Pooled
         /// Gets the element at the specified index in this block of memory.
         /// </summary>
         /// <param name="index">The zero-based index of the element to get.</param>
-        /// <returns>The element at the specified index in the block of memory.</returns>
+        /// <returns>The element at the specified index in this block of memory.</returns>
         public T this[int index]
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -54,7 +55,7 @@ namespace Collections.Pooled
         }
 
         /// <summary>
-        /// Memory representing the block of memory.
+        /// <see cref="Memory{T}"/> representing this block of memory.
         /// </summary>
         public Memory<T> Memory
         {
@@ -63,7 +64,7 @@ namespace Collections.Pooled
         }
 
         /// <summary>
-        /// Span representing the block of memory.
+        /// <see cref="Span{T}"/> representing this block of memory.
         /// </summary>
         public Span<T> Span
         {
@@ -77,9 +78,9 @@ namespace Collections.Pooled
         public ClearMode ClearMode => _clearOnFree ? ClearMode.Always : ClearMode.Never;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="PooledMemory{T}"/> class with zero length.
+        /// Initializes a new default instance of the <see cref="PooledMemory{T}"/> class with zero elements.
         /// </summary>
-        public PooledMemory() : this(0, ClearMode.Auto, ArrayPool<T>.Shared)
+        public PooledMemory() : this(count: 0)
         {
         }
 
@@ -87,7 +88,7 @@ namespace Collections.Pooled
         /// Initializes a new instance of the <see cref="PooledMemory{T}"/> class by renting a buffer of the specified length
         /// from an <see cref="ArrayPool{T}"/> and constraining the logical length to the requested <paramref name="count"/>.
         /// </summary>
-        /// <param name="count">The number of elements in the memory block. Must be non-negative.</param>
+        /// <param name="count">The number of elements in this memory block. Must be non-negative.</param>
         /// <remarks>
         /// The underlying rented array may be larger than <paramref name="count"/>; the logical length is constrained to <paramref name="count"/>.
         /// Uses <see cref="ArrayPool{T}.Shared"/> and ClearMode.Auto by default.
@@ -102,7 +103,7 @@ namespace Collections.Pooled
         /// Initializes a new instance of the <see cref="PooledMemory{T}"/> class by renting a buffer of the specified length
         /// and configuring the clearing behavior when returning to the pool.
         /// </summary>
-        /// <param name="count">The number of elements in the memory block. Must be non-negative.</param>
+        /// <param name="count">The number of elements in this memory block. Must be non-negative.</param>
         /// <param name="clearMode">
         /// Specifies whether the underlying array should be cleared when returned to the pool:
         /// <see cref="ClearMode.Always"/>, <see cref="ClearMode.Never"/>, or <see cref="ClearMode.Auto"/> (clears for reference-containing types).
@@ -118,7 +119,7 @@ namespace Collections.Pooled
         /// Initializes a new instance of the <see cref="PooledMemory{T}"/> class by renting a buffer of the specified length
         /// from a custom <see cref="ArrayPool{T}"/>.
         /// </summary>
-        /// <param name="count">The number of elements in the memory block. Must be non-negative.</param>
+        /// <param name="count">The number of elements in this memory block. Must be non-negative.</param>
         /// <param name="customPool">
         /// The pool to rent from. If null, <see cref="ArrayPool{T}.Shared"/> is used.
         /// </param>
@@ -133,7 +134,7 @@ namespace Collections.Pooled
         /// Initializes a new instance of the <see cref="PooledMemory{T}"/> class by renting a buffer of the specified length
         /// from the provided <see cref="ArrayPool{T}"/> and configuring the clearing behavior.
         /// </summary>
-        /// <param name="count">The number of elements in the memory block. Must be non-negative.</param>
+        /// <param name="count">The number of elements in this memory block. Must be non-negative.</param>
         /// <param name="clearMode">
         /// Specifies whether the underlying array should be cleared when returned to the pool:
         /// <see cref="ClearMode.Always"/>, <see cref="ClearMode.Never"/>, or <see cref="ClearMode.Auto"/> (clears for reference-containing types).
@@ -206,12 +207,11 @@ namespace Collections.Pooled
         /// </param>
         public PooledMemory(ReadOnlySpan<T> span, ClearMode clearMode, ArrayPool<T> customPool)
         {
-            int count = span.Length;
-            if (count < 0)
-                ThrowHelper.ThrowValueArgumentOutOfRange_NeedNonNegNumException();
+            int count = span.Length; // Can't be negative
             _pool = customPool ?? ArrayPool<T>.Shared;
             _clearOnFree = ShouldClear(clearMode);
             _array = _pool.Rent(count);
+            Count = count;
             try
             {
                 span.CopyTo(_array);
@@ -222,7 +222,6 @@ namespace Collections.Pooled
                 _pool.Return(_array, _clearOnFree);
                 throw;
             }
-            Count = count;
         }
 
         /// <summary>
@@ -296,6 +295,7 @@ namespace Collections.Pooled
                 {
                     int count = c.Count;
                     _array = _pool.Rent(count);
+                    Count = count;
                     try
                     {
                         c.CopyTo(_array, 0);
@@ -306,7 +306,6 @@ namespace Collections.Pooled
                         _pool.Return(_array, _clearOnFree);
                         throw;
                     }
-                    Count = count;
                     break;
                 }
 
@@ -314,10 +313,10 @@ namespace Collections.Pooled
                 {
                     int count = rc.Count;
                     _array = _pool.Rent(count);
+                    Count = count;
                     int i = 0;
                     foreach (var item in rc)
                         _array[i++] = item;
-                    Count = count;
                     break;
                 }
 
@@ -325,6 +324,7 @@ namespace Collections.Pooled
                 {
                     int count = nc.Count;
                     _array = _pool.Rent(count);
+                    Count = count;
                     try
                     {
                         nc.CopyTo(_array, 0);
@@ -335,29 +335,37 @@ namespace Collections.Pooled
                         _pool.Return(_array, _clearOnFree);
                         throw;
                     }
-                    Count = count;
                     break;
                 }
 
                 default:
                 {
-                    // Avoids double-enumeration and ensure exact sizing
-                    using (var list = new PooledList<T>(enumerable))
+                    int capacity = 4; // Start small and grow as needed
+                    _array = _pool.Rent(capacity);
+
+                    int i = 0;
+                    foreach (var item in enumerable)
                     {
-                        int count = list.Count;
-                        _array = _pool.Rent(count);
-                        try
+                        if (i == capacity)
                         {
-                            list.Span.CopyTo(_array);
-                        }
-                        catch
-                        {
-                            // If CopyTo throws, return the array to the pool before propagating the exception.
+                            // Need more space -> double capacity
+                            int newCapacity = capacity * 2;
+                            T[] newArray = _pool.Rent(newCapacity);
+
+                            // Copy over existing
+                            Array.Copy(_array, 0, newArray, 0, capacity);
+
+                            // Return old array
                             _pool.Return(_array, _clearOnFree);
-                            throw;
+
+                            _array = newArray;
+                            capacity = newCapacity;
                         }
-                        Count = count;
+
+                        _array[i++] = item;
                     }
+
+                    Count = i;
                     break;
                 }
             }
@@ -367,7 +375,7 @@ namespace Collections.Pooled
         /// Returns an enumerator that iterates through the collection.
         /// </summary>
         /// <returns>An enumerator that can be used to iterate through the collection.</returns>
-        public Span<T>.Enumerator GetEnumerator() => Span.GetEnumerator();
+        public Span<T>.Enumerator GetEnumerator() => Span.GetEnumerator(); // Span enumerator is a ref struct (fast!)
 
         /// <summary>
         /// Returns an enumerator that iterates through the collection.
@@ -406,7 +414,7 @@ namespace Collections.Pooled
                 {
                     try
                     {
-                        (_pool ?? ArrayPool<T>.Shared).Return(
+                        _pool.Return(
                             array: array,
                             clearArray: _clearOnFree);
                     }

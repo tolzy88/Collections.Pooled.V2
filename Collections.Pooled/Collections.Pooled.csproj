@@ -21,9 +21,9 @@
 	<PackageId>Collections.Pooled.V2</PackageId>
 	<Product>Collections.Pooled.V2</Product>
 	<AssemblyTitle>Collections.Pooled.V2</AssemblyTitle>
-	<AssemblyVersion>2.1.1.0</AssemblyVersion>
-	<FileVersion>2.1.1.0</FileVersion>
-	<Version>2.1.1</Version>
+	<AssemblyVersion>2.1.2.0</AssemblyVersion>
+	<FileVersion>2.1.2.0</FileVersion>
+	<Version>2.1.2</Version>
 	<Authors>tolzy88, jtmueller</Authors>
 	<Company />
 	<Description>Fast, low-allocation ports of List, Dictionary, HashSet, Stack, and Queue using ArrayPool and Span.</Description>
