@@ -342,6 +342,8 @@ namespace Collections.Pooled
                 {
                     int capacity = 4; // Start small and grow as needed
                     _array = _pool.Rent(capacity);
+                    // Rent may return a bigger array, that is OK
+                    capacity = _array.Length;
 
                     int i = 0;
                     foreach (var item in enumerable)
