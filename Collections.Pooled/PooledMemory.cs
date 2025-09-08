@@ -1,4 +1,4 @@
-﻿//
+//
 // Authors:
 //   Steven Tolzmann
 //
@@ -351,6 +351,8 @@ namespace Collections.Pooled
                             // Need more space -> double capacity
                             int newCapacity = capacity * 2;
                             T[] newArray = _pool.Rent(newCapacity);
+                            // Rent may return a bigger array, that is OK
+                            newCapacity = newArray.Length;
 
                             // Copy over existing
                             Array.Copy(_array, 0, newArray, 0, capacity);
