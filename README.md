@@ -16,11 +16,11 @@ been ported from [corefx](https://github.com/dotnet/corefx).
 
 ```
 Collections.Pooled.Tests
-  Tests in group: 27501
-   Total Duration: 3.8 sec
+  Tests in group: 27567
+   Total Duration: 4.1 sec
 
 Outcomes
-   27501 Passed
+   27567 Passed
 ```
 
 ## Installation
