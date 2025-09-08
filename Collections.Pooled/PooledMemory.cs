@@ -77,6 +77,13 @@ namespace Collections.Pooled
         public ClearMode ClearMode => _clearOnFree ? ClearMode.Always : ClearMode.Never;
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="PooledMemory{T}"/> class with zero length.
+        /// </summary>
+        public PooledMemory() : this(0, ClearMode.Auto, ArrayPool<T>.Shared)
+        {
+        }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="PooledMemory{T}"/> class by renting a buffer of the specified length
         /// from an <see cref="ArrayPool{T}"/> and constraining the logical length to the requested <paramref name="count"/>.
         /// </summary>
