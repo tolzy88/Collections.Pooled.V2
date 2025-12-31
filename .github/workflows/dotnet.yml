@@ -36,6 +36,9 @@ jobs:
         uses: actions/setup-dotnet@v5
         with:
           dotnet-version: "9.0.x"
+
+      - name: Run Tests
+        run: dotnet test ./Collections.Pooled.Tests/Collections.Pooled.Tests.csproj
     
       - name: Pack NuGet (Release)
         run: |
