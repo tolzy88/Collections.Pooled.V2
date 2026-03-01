@@ -10,6 +10,7 @@ namespace Collections.Pooled.Benchmarks.PooledList
     // When this is resolved, should change all the tests to run both job types at the same time.
 
     [SimpleJob(RuntimeMoniker.Net80)]
+    [SimpleJob(RuntimeMoniker.Net10_0)]
     [MemoryDiagnoser]
     public class List_Add : ListBase
     {

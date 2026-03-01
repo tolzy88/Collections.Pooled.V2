@@ -6,6 +6,7 @@ using BenchmarkDotNet.Jobs;
 namespace Collections.Pooled.Benchmarks.PooledDictionary
 {
     [SimpleJob(RuntimeMoniker.Net80)]
+    [SimpleJob(RuntimeMoniker.Net10_0)]
     [MemoryDiagnoser]
     public class Dict_Add : DictBase
     {

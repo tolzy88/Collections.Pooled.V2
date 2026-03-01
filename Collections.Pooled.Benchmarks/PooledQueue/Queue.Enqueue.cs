@@ -6,6 +6,7 @@ using System.Collections.Generic;
 namespace Collections.Pooled.Benchmarks.PooledQueue
 {
     [SimpleJob(RuntimeMoniker.Net80)]
+    [SimpleJob(RuntimeMoniker.Net10_0)]
     [MemoryDiagnoser]
     public class Queue_Enqueue : QueueBase
     {

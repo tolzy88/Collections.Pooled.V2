@@ -6,6 +6,7 @@ using System.Collections.Generic;
 namespace Collections.Pooled.Benchmarks.PooledSet
 {
     [SimpleJob(RuntimeMoniker.Net80)]
+    [SimpleJob(RuntimeMoniker.Net10_0)]
     [MemoryDiagnoser]
     public class Set_Contains_False : SetBase
     {

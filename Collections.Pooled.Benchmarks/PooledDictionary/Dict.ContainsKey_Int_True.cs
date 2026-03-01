@@ -6,6 +6,7 @@ using System.Collections.Generic;
 namespace Collections.Pooled.Benchmarks.PooledDictionary
 {
     [SimpleJob(RuntimeMoniker.Net80)]
+    [SimpleJob(RuntimeMoniker.Net10_0)]
     public class Dict_ContainsKey_Int_True : DictContainsBase<int>
     {
         [Benchmark(Baseline = true)]
