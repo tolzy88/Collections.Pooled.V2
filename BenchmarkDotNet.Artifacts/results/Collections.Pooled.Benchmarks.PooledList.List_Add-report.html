@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+<meta charset='utf-8' />
+<title>Collections.Pooled.Benchmarks.PooledList.List_Add-20260301-234633</title>
+
+<style type="text/css">
+	table { border-collapse: collapse; display: block; width: 100%; overflow: auto; }
+	td, th { padding: 6px 13px; border: 1px solid #ddd; text-align: right; }
+	tr { background-color: #fff; border-top: 1px solid #ccc; }
+	tr:nth-child(even) { background: #f8f8f8; }
+</style>
+</head>
+<body>
+<pre><code>
+BenchmarkDotNet v0.15.8, Linux Ubuntu 24.04.3 LTS (Noble Numbat)
+AMD EPYC 7763 2.45GHz, 1 CPU, 4 logical and 2 physical cores
+.NET SDK 10.0.102
+  [Host]    : .NET 10.0.2 (10.0.2, 10.0.225.61305), X64 RyuJIT x86-64-v3
+  .NET 10.0 : .NET 10.0.2 (10.0.2, 10.0.225.61305), X64 RyuJIT x86-64-v3
+  .NET 8.0  : .NET 8.0.24 (8.0.24, 8.0.2426.7010), X64 RyuJIT x86-64-v3
+</code></pre>
+<pre><code></code></pre>
+
+<table>
+<thead><tr><th>Method</th><th>Job</th><th>Runtime</th><th>N</th><th>Mean  </th><th>Error</th><th>StdDev</th><th>Ratio</th><th>RatioSD</th><th>Gen0</th><th>Gen1</th><th>Gen2</th><th>Allocated</th><th>Alloc Ratio</th>
+</tr>
+</thead><tbody><tr><td>ListAdd</td><td>.NET 10.0</td><td>.NET 10.0</td><td>10000</td><td>572.08 &mu;s</td><td>5.471 &mu;s</td><td>4.568 &mu;s</td><td>1.00</td><td>0.01</td><td>333.0078</td><td>333.0078</td><td>333.0078</td><td>1240264 B</td><td>1.000</td>
+</tr><tr><td>PooledAdd</td><td>.NET 10.0</td><td>.NET 10.0</td><td>10000</td><td>92.44 &mu;s</td><td>0.167 &mu;s</td><td>0.140 &mu;s</td><td>0.16</td><td>0.00</td><td>-</td><td>-</td><td>-</td><td>56 B</td><td>0.000</td>
+</tr><tr><td>ListAdd</td><td>.NET 8.0</td><td>.NET 8.0</td><td>10000</td><td>581.18 &mu;s</td><td>6.148 &mu;s</td><td>5.751 &mu;s</td><td>1.00</td><td>0.01</td><td>333.0078</td><td>333.0078</td><td>333.0078</td><td>1240264 B</td><td>1.000</td>
+</tr><tr><td>PooledAdd</td><td>.NET 8.0</td><td>.NET 8.0</td><td>10000</td><td>92.52 &mu;s</td><td>0.218 &mu;s</td><td>0.193 &mu;s</td><td>0.16</td><td>0.00</td><td>-</td><td>-</td><td>-</td><td>56 B</td><td>0.000</td>
+</tr><tr><td>ListAdd</td><td>.NET 10.0</td><td>.NET 10.0</td><td>100000</td><td>3,441.00 &mu;s</td><td>65.365 &mu;s</td><td>87.261 &mu;s</td><td>1.00</td><td>0.04</td><td>496.0938</td><td>496.0938</td><td>496.0938</td><td>12400307 B</td><td>1.000</td>
+</tr><tr><td>PooledAdd</td><td>.NET 10.0</td><td>.NET 10.0</td><td>100000</td><td>905.62 &mu;s</td><td>11.713 &mu;s</td><td>10.957 &mu;s</td><td>0.26</td><td>0.01</td><td>-</td><td>-</td><td>-</td><td>56 B</td><td>0.000</td>
+</tr><tr><td>ListAdd</td><td>.NET 8.0</td><td>.NET 8.0</td><td>100000</td><td>3,677.43 &mu;s</td><td>36.528 &mu;s</td><td>32.381 &mu;s</td><td>1.00</td><td>0.01</td><td>496.0938</td><td>496.0938</td><td>496.0938</td><td>12400313 B</td><td>1.000</td>
+</tr><tr><td>PooledAdd</td><td>.NET 8.0</td><td>.NET 8.0</td><td>100000</td><td>929.26 &mu;s</td><td>7.585 &mu;s</td><td>6.724 &mu;s</td><td>0.25</td><td>0.00</td><td>-</td><td>-</td><td>-</td><td>56 B</td><td>0.000</td>
+</tr><tr><td>ListAdd</td><td>.NET 10.0</td><td>.NET 10.0</td><td>1000000</td><td>17,523.41 &mu;s</td><td>272.895 &mu;s</td><td>255.266 &mu;s</td><td>1.00</td><td>0.02</td><td>1281.2500</td><td>1281.2500</td><td>1281.2500</td><td>124000552 B</td><td>1.000</td>
+</tr><tr><td>PooledAdd</td><td>.NET 10.0</td><td>.NET 10.0</td><td>1000000</td><td>11,885.86 &mu;s</td><td>148.882 &mu;s</td><td>139.264 &mu;s</td><td>0.68</td><td>0.01</td><td>-</td><td>-</td><td>-</td><td>56 B</td><td>0.000</td>
+</tr><tr><td>ListAdd</td><td>.NET 8.0</td><td>.NET 8.0</td><td>1000000</td><td>18,986.79 &mu;s</td><td>361.937 &mu;s</td><td>338.556 &mu;s</td><td>1.00</td><td>0.02</td><td>1812.5000</td><td>1812.5000</td><td>1812.5000</td><td>124000739 B</td><td>1.000</td>
+</tr><tr><td>PooledAdd</td><td>.NET 8.0</td><td>.NET 8.0</td><td>1000000</td><td>11,799.60 &mu;s</td><td>152.006 &mu;s</td><td>142.187 &mu;s</td><td>0.62</td><td>0.01</td><td>-</td><td>-</td><td>-</td><td>56 B</td><td>0.000</td>
+</tr></tbody></table>
+</body>
+</html>
