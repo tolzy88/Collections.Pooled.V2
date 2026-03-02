@@ -72,7 +72,7 @@ There are some API changes worth noting:
 #### Performance
 
 Adding items to a list is one area where ArrayPool helps us quite a bit:
-![List Add Benchmarks](./docs/benchmarks/net8.0-net10.0/List_Add.svg) 
+![List Add Benchmarks](./docs/benchmarks/net8.0-net10.0/List_Add.svg)
 
 ## `PooledDictionary<TKey, TValue>`
 
@@ -95,7 +95,7 @@ There are some API changes worth noting:
 #### Performance
 
 Adding to dictionaries is where using ArrayPool really has an impact:
-![Dictionary Add Benchmarks](./docs/benchmarks/net8.0-net10.0/Dict_Add.svg) 
+![Dictionary Add Benchmarks](./docs/benchmarks/net8.0-net10.0/Dict_Add.svg)
 
 ## `PooledSet<T>`
 
@@ -118,7 +118,7 @@ modified to use ArrayPool for internal storage allocation, and to support `ReadO
 
 Here's what pooling does for us when adding to a PooledSet. 
 
-![Set Add Benchmarks](./docs/benchmarks/net8.0-net10.0/Set_Add.svg) 
+![Set Add Benchmarks](./docs/benchmarks/net8.0-net10.0/Set_Add.svg)
 
 ## `PooledStack<T>`
 
@@ -141,7 +141,7 @@ modified to use ArrayPool for internal storage allocation.
 #### Performance
 
 Once again, pushing to a stack shows off some of the advantages of using ArrayPool:
-![Stack Push Benchmarks](./docs/benchmarks/net8.0-net10.0/Stack_Push.svg) 
+![Stack Push Benchmarks](./docs/benchmarks/net8.0-net10.0/Stack_Push.svg)
 
 ## `PooledQueue<T>`
 
