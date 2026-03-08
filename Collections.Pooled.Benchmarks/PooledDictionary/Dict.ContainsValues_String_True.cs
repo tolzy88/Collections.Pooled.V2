@@ -7,6 +7,7 @@ using System.Linq;
 namespace Collections.Pooled.Benchmarks.PooledDictionary
 {
     [SimpleJob(RuntimeMoniker.Net80)]
+    [SimpleJob(RuntimeMoniker.Net10_0)]
     public class Dict_ContainsValue_String_True : DictContainsBase<string>
     {
         [Benchmark(Baseline = true)]
