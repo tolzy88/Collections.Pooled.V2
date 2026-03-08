@@ -42,7 +42,7 @@ namespace Collections.Pooled
         public static PooledDictionary<TKey, TValue> ToPooledDictionary<TSource, TKey, TValue>(
             this IEnumerable<TSource> source,
             Func<TSource, TKey> keySelector, Func<TSource, TValue> valueSelector,
-            IEqualityComparer<TKey> comparer = null)
+            IEqualityComparer<TKey>? comparer = null)
         {
             if (source == null)
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.source);
@@ -62,7 +62,7 @@ namespace Collections.Pooled
         public static PooledDictionary<TKey, TValue> ToPooledDictionary<TSource, TKey, TValue>(
             this ReadOnlySpan<TSource> source,
             Func<TSource, TKey> keySelector, Func<TSource, TValue> valueSelector,
-            IEqualityComparer<TKey> comparer = null)
+            IEqualityComparer<TKey>? comparer = null)
         {
             var dict = new PooledDictionary<TKey, TValue>(source.Length, comparer);
             foreach (var item in source)
@@ -112,7 +112,7 @@ namespace Collections.Pooled
         /// </summary>
         public static PooledDictionary<TKey, TSource> ToPooledDictionary<TSource, TKey>(
             this IEnumerable<TSource> source,
-            Func<TSource, TKey> keySelector, IEqualityComparer<TKey> comparer = null)
+            Func<TSource, TKey> keySelector, IEqualityComparer<TKey>? comparer = null)
         {
             if (source == null)
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.source);
@@ -131,7 +131,7 @@ namespace Collections.Pooled
         /// </summary>
         public static PooledDictionary<TKey, TSource> ToPooledDictionary<TSource, TKey>(
             this ReadOnlySpan<TSource> source,
-            Func<TSource, TKey> keySelector, IEqualityComparer<TKey> comparer = null)
+            Func<TSource, TKey> keySelector, IEqualityComparer<TKey>? comparer = null)
         {
             var dict = new PooledDictionary<TKey, TSource>(source.Length, comparer);
             foreach (var item in source)
@@ -147,7 +147,7 @@ namespace Collections.Pooled
         /// key selector and comparer.
         /// </summary>
         public static PooledDictionary<TKey, TSource> ToPooledDictionary<TSource, TKey>(this Span<TSource> source,
-            Func<TSource, TKey> keySelector, IEqualityComparer<TKey> comparer = null)
+            Func<TSource, TKey> keySelector, IEqualityComparer<TKey>? comparer = null)
         {
             return ToPooledDictionary((ReadOnlySpan<TSource>)source, keySelector, comparer);
         }
@@ -158,7 +158,7 @@ namespace Collections.Pooled
         /// </summary>
         public static PooledDictionary<TKey, TSource> ToPooledDictionary<TSource, TKey>(
             this ReadOnlyMemory<TSource> source,
-            Func<TSource, TKey> keySelector, IEqualityComparer<TKey> comparer = null)
+            Func<TSource, TKey> keySelector, IEqualityComparer<TKey>? comparer = null)
         {
             return ToPooledDictionary(source.Span, keySelector, comparer);
         }
@@ -168,7 +168,7 @@ namespace Collections.Pooled
         /// key selector and comparer.
         /// </summary>
         public static PooledDictionary<TKey, TSource> ToPooledDictionary<TSource, TKey>(this Memory<TSource> source,
-            Func<TSource, TKey> keySelector, IEqualityComparer<TKey> comparer = null)
+            Func<TSource, TKey> keySelector, IEqualityComparer<TKey>? comparer = null)
         {
             return ToPooledDictionary(source.Span, keySelector, comparer);
         }
@@ -178,7 +178,7 @@ namespace Collections.Pooled
         /// </summary>
         public static PooledDictionary<TKey, TValue> ToPooledDictionary<TKey, TValue>(
             this IEnumerable<(TKey, TValue)> source,
-            IEqualityComparer<TKey> comparer = null)
+            IEqualityComparer<TKey>? comparer = null)
         {
             return new PooledDictionary<TKey, TValue>(source, comparer);
         }
@@ -188,7 +188,7 @@ namespace Collections.Pooled
         /// </summary>
         public static PooledDictionary<TKey, TValue> ToPooledDictionary<TKey, TValue>(
             this IEnumerable<KeyValuePair<TKey, TValue>> source,
-            IEqualityComparer<TKey> comparer = null)
+            IEqualityComparer<TKey>? comparer = null)
         {
             return new PooledDictionary<TKey, TValue>(source, comparer);
         }
@@ -198,7 +198,7 @@ namespace Collections.Pooled
         /// </summary>
         public static PooledDictionary<TKey, TValue> ToPooledDictionary<TKey, TValue>(
             this IEnumerable<Tuple<TKey, TValue>> source,
-            IEqualityComparer<TKey> comparer = null)
+            IEqualityComparer<TKey>? comparer = null)
         {
             if (source == null)
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.source);
@@ -217,7 +217,7 @@ namespace Collections.Pooled
         /// </summary>
         public static PooledDictionary<TKey, TValue> ToPooledDictionary<TKey, TValue>(
             this ReadOnlySpan<(TKey, TValue)> source,
-            IEqualityComparer<TKey> comparer = null)
+            IEqualityComparer<TKey>? comparer = null)
         {
             return new PooledDictionary<TKey, TValue>(source, comparer);
         }
@@ -226,7 +226,7 @@ namespace Collections.Pooled
         /// Creates a <see cref="PooledDictionary{TKey,TValue}"/> from a span of key/value tuples.
         /// </summary>
         public static PooledDictionary<TKey, TValue> ToPooledDictionary<TKey, TValue>(this Span<(TKey, TValue)> source,
-            IEqualityComparer<TKey> comparer = null)
+            IEqualityComparer<TKey>? comparer = null)
         {
             return new PooledDictionary<TKey, TValue>(source, comparer);
         }
@@ -235,19 +235,19 @@ namespace Collections.Pooled
 
         #region PooledSet
 
-        public static PooledSet<T> ToPooledSet<T>(this IEnumerable<T> source, IEqualityComparer<T> comparer = null)
+        public static PooledSet<T> ToPooledSet<T>(this IEnumerable<T> source, IEqualityComparer<T>? comparer = null)
             => new PooledSet<T>(source, comparer);
 
-        public static PooledSet<T> ToPooledSet<T>(this Span<T> source, IEqualityComparer<T> comparer = null)
+        public static PooledSet<T> ToPooledSet<T>(this Span<T> source, IEqualityComparer<T>? comparer = null)
             => new PooledSet<T>(source, comparer);
 
-        public static PooledSet<T> ToPooledSet<T>(this ReadOnlySpan<T> source, IEqualityComparer<T> comparer = null)
+        public static PooledSet<T> ToPooledSet<T>(this ReadOnlySpan<T> source, IEqualityComparer<T>? comparer = null)
             => new PooledSet<T>(source, comparer);
 
-        public static PooledSet<T> ToPooledSet<T>(this Memory<T> source, IEqualityComparer<T> comparer = null)
+        public static PooledSet<T> ToPooledSet<T>(this Memory<T> source, IEqualityComparer<T>? comparer = null)
             => new PooledSet<T>(source.Span, comparer);
 
-        public static PooledSet<T> ToPooledSet<T>(this ReadOnlyMemory<T> source, IEqualityComparer<T> comparer = null)
+        public static PooledSet<T> ToPooledSet<T>(this ReadOnlyMemory<T> source, IEqualityComparer<T>? comparer = null)
             => new PooledSet<T>(source.Span, comparer);
 
         #endregion

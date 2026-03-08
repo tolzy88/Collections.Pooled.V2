@@ -38,7 +38,7 @@ namespace Collections.Pooled
         [NonSerialized]
         private ArrayPool<T> _pool;
         [NonSerialized]
-        private object _syncRoot;
+        private object? _syncRoot;
 
         private T[] _array;
         private int _head;       // The index from which to dequeue if the queue isn't empty.
@@ -240,9 +240,9 @@ namespace Collections.Pooled
             {
                 if (_syncRoot == null)
                 {
-                    Interlocked.CompareExchange<object>(ref _syncRoot, new object(), null);
+                    Interlocked.CompareExchange<object?>(ref _syncRoot, new object(), null);
                 }
-                return _syncRoot;
+                return _syncRoot!;
             }
         }
 
@@ -412,7 +412,7 @@ namespace Collections.Pooled
             T removed = array[head];
             if (_clearOnFree)
             {
-                array[head] = default;
+                array[head] = default!;
             }
             MoveNext(ref _head);
             _size--;
@@ -427,14 +427,14 @@ namespace Collections.Pooled
 
             if (_size == 0)
             {
-                result = default;
+                result = default!;
                 return false;
             }
 
             result = array[head];
             if (_clearOnFree)
             {
-                array[head] = default;
+                array[head] = default!;
             }
             MoveNext(ref _head);
             _size--;
@@ -461,7 +461,7 @@ namespace Collections.Pooled
         {
             if (_size == 0)
             {
-                result = default;
+                result = default!;
                 return false;
             }
 
@@ -681,13 +681,13 @@ namespace Collections.Pooled
                 _q = q;
                 _version = q._version;
                 _index = -1;
-                _currentElement = default;
+                _currentElement = default!;
             }
 
             public void Dispose()
             {
                 _index = -2;
-                _currentElement = default;
+                _currentElement = default!;
             }
 
             public bool MoveNext()
@@ -704,7 +704,7 @@ namespace Collections.Pooled
                 {
                     // We've run past the last element
                     _index = -2;
-                    _currentElement = default;
+                    _currentElement = default!;
                     return false;
                 }
 
@@ -750,14 +750,14 @@ namespace Collections.Pooled
                     ThrowHelper.ThrowInvalidOperationException_InvalidOperation_EnumEnded();
             }
 
-            object IEnumerator.Current => Current;
+            object IEnumerator.Current => Current!;
 
             void IEnumerator.Reset()
             {
                 if (_version != _q._version)
                     ThrowHelper.ThrowInvalidOperationException_InvalidOperation_EnumFailedVersion();
                 _index = -1;
-                _currentElement = default;
+                _currentElement = default!;
             }
         }
     }

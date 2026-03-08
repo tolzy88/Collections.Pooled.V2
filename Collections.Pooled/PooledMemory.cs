@@ -26,7 +26,7 @@ namespace Collections.Pooled
         private static readonly T[] s_emptyArray = Array.Empty<T>();
         private readonly ArrayPool<T> _pool;
         private readonly bool _clearOnFree;
-        private T[] _array;
+        private T[]? _array;
 
         /// <summary>
         /// Gets the number of elements in this block of memory.
@@ -45,14 +45,14 @@ namespace Collections.Pooled
             {
                 if ((uint)index >= (uint)Count)
                     ThrowHelper.ThrowArgumentOutOfRange_IndexException();
-                return _array[index];
+                return _array![index];
             }
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             set
             {
                 if ((uint)index >= (uint)Count)
                     ThrowHelper.ThrowArgumentOutOfRange_IndexException();
-                _array[index] = value;
+                _array![index] = value;
             }
         }
 
@@ -62,7 +62,7 @@ namespace Collections.Pooled
         public Memory<T> Memory
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get => _array.AsMemory(0, Count);
+            get => _array!.AsMemory(0, Count);
         }
 
         /// <summary>
@@ -71,7 +71,7 @@ namespace Collections.Pooled
         public Span<T> Span
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get => _array.AsSpan(0, Count);
+            get => _array!.AsSpan(0, Count);
         }
 
         /// <summary>
@@ -319,109 +319,109 @@ namespace Collections.Pooled
                     break;
 
                 case ICollection<T> c:
-                {
-                    int count = c.Count;
-                    if (count == 0)
                     {
-                        _array = s_emptyArray;
-                        Count = 0;
-                    }
-                    else
-                    {
-                        _array = _pool.Rent(count);
-                        Count = count;
-                        try
+                        int count = c.Count;
+                        if (count == 0)
                         {
-                            c.CopyTo(_array, 0);
+                            _array = s_emptyArray;
+                            Count = 0;
                         }
-                        catch
+                        else
                         {
-                            _pool.Return(_array, _clearOnFree);
-                            throw;
+                            _array = _pool.Rent(count);
+                            Count = count;
+                            try
+                            {
+                                c.CopyTo(_array, 0);
+                            }
+                            catch
+                            {
+                                _pool.Return(_array, _clearOnFree);
+                                throw;
+                            }
                         }
+                        break;
                     }
-                    break;
-                }
 
                 case IReadOnlyCollection<T> rc:
-                {
-                    int count = rc.Count;
-                    if (count == 0)
                     {
-                        _array = s_emptyArray;
-                        Count = 0;
+                        int count = rc.Count;
+                        if (count == 0)
+                        {
+                            _array = s_emptyArray;
+                            Count = 0;
+                        }
+                        else
+                        {
+                            _array = _pool.Rent(count);
+                            Count = count;
+                            int i = 0;
+                            foreach (var item in rc)
+                                _array[i++] = item;
+                        }
+                        break;
                     }
-                    else
-                    {
-                        _array = _pool.Rent(count);
-                        Count = count;
-                        int i = 0;
-                        foreach (var item in rc)
-                            _array[i++] = item;
-                    }
-                    break;
-                }
 
                 case System.Collections.ICollection nc:
-                {
-                    int count = nc.Count;
-                    if (count == 0)
                     {
-                        _array = s_emptyArray;
-                        Count = 0;
-                    }
-                    else
-                    {
-                        _array = _pool.Rent(count);
-                        Count = count;
-                        try
+                        int count = nc.Count;
+                        if (count == 0)
                         {
-                            nc.CopyTo(_array, 0);
+                            _array = s_emptyArray;
+                            Count = 0;
                         }
-                        catch
+                        else
                         {
-                            _pool.Return(_array, _clearOnFree);
-                            throw;
+                            _array = _pool.Rent(count);
+                            Count = count;
+                            try
+                            {
+                                nc.CopyTo(_array, 0);
+                            }
+                            catch
+                            {
+                                _pool.Return(_array, _clearOnFree);
+                                throw;
+                            }
                         }
+                        break;
                     }
-                    break;
-                }
 
                 default:
-                {
-                    // Non-optimal path, but should work for any IEnumerable<T>.
-                    // If suggestCapacity is accurate, only one array rent will be needed.
-                    if (suggestCapacity < 0)
-                    ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.capacity,
-                        ExceptionResource.ArgumentOutOfRange_NeedNonNegNum);
-
-                    _array = _pool.Rent(suggestCapacity);
-                    // Rent may return more than requested, update to actual length
-                    suggestCapacity = _array.Length;
-
-                    int i = 0;
-                    foreach (var item in enumerable)
                     {
-                        if (i == suggestCapacity)
-                        {
-                            int newCapacity = suggestCapacity * 2;
-                            T[] newArray = _pool.Rent(newCapacity);
-                            // Rent may return more than requested, update to actual length
-                            newCapacity = newArray.Length;
-                            // Copy old array to new and return old array to pool
-                            Array.Copy(_array, 0, newArray, 0, suggestCapacity);
-                            _pool.Return(_array, _clearOnFree);
+                        // Non-optimal path, but should work for any IEnumerable<T>.
+                        // If suggestCapacity is accurate, only one array rent will be needed.
+                        if (suggestCapacity < 0)
+                            ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.capacity,
+                                ExceptionResource.ArgumentOutOfRange_NeedNonNegNum);
 
-                            _array = newArray;
-                            suggestCapacity = newCapacity;
+                        _array = _pool.Rent(suggestCapacity);
+                        // Rent may return more than requested, update to actual length
+                        suggestCapacity = _array.Length;
+
+                        int i = 0;
+                        foreach (var item in enumerable)
+                        {
+                            if (i == suggestCapacity)
+                            {
+                                int newCapacity = suggestCapacity * 2;
+                                T[] newArray = _pool.Rent(newCapacity);
+                                // Rent may return more than requested, update to actual length
+                                newCapacity = newArray.Length;
+                                // Copy old array to new and return old array to pool
+                                Array.Copy(_array, 0, newArray, 0, suggestCapacity);
+                                _pool.Return(_array, _clearOnFree);
+
+                                _array = newArray;
+                                suggestCapacity = newCapacity;
+                            }
+
+                            _array[i++] = item;
                         }
 
-                        _array[i++] = item;
+                        Count = i;
+                        break;
                     }
-
-                    Count = i;
-                    break;
-                }
             }
         }
 
@@ -439,7 +439,7 @@ namespace Collections.Pooled
         IEnumerator<T> IEnumerable<T>.GetEnumerator()
         {
             for (int i = 0; i < Count; i++)
-                yield return _array[i];
+                yield return _array![i];
         }
 
         /// <summary>
@@ -449,7 +449,7 @@ namespace Collections.Pooled
         IEnumerator IEnumerable.GetEnumerator()
         {
             for (int i = 0; i < Count; i++)
-                yield return _array[i];
+                yield return _array![i];
         }
 
         /// <summary>

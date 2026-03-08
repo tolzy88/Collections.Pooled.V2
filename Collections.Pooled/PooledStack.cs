@@ -34,7 +34,7 @@ namespace Collections.Pooled
         [NonSerialized]
         private ArrayPool<T> _pool;
         [NonSerialized]
-        private object _syncRoot;
+        private object? _syncRoot;
 
         private T[] _array; // Storage for stack elements. Do not rename (binary serialization)
         private int _size; // Number of items in the stack. Do not rename (binary serialization)
@@ -96,7 +96,7 @@ namespace Collections.Pooled
         {
             if (capacity < 0)
             {
-                ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.capacity, 
+                ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.capacity,
                     ExceptionResource.ArgumentOutOfRange_NeedNonNegNum);
             }
             _pool = customPool ?? ArrayPool<T>.Shared;
@@ -237,9 +237,9 @@ namespace Collections.Pooled
             {
                 if (_syncRoot == null)
                 {
-                    Interlocked.CompareExchange<object>(ref _syncRoot, new object(), null);
+                    Interlocked.CompareExchange<object?>(ref _syncRoot, new object(), null);
                 }
-                return _syncRoot;
+                return _syncRoot!;
             }
         }
 
@@ -460,7 +460,7 @@ namespace Collections.Pooled
 
             if ((uint)size >= (uint)array.Length)
             {
-                result = default;
+                result = default!;
                 return false;
             }
             result = array[size];
@@ -489,7 +489,7 @@ namespace Collections.Pooled
             T item = array[size];
             if (_clearOnFree)
             {
-                array[size] = default;     // Free memory quicker.
+                array[size] = default!;     // Free memory quicker.
             }
             return item;
         }
@@ -501,7 +501,7 @@ namespace Collections.Pooled
 
             if ((uint)size >= (uint)array.Length)
             {
-                result = default;
+                result = default!;
                 return false;
             }
 
@@ -510,7 +510,7 @@ namespace Collections.Pooled
             result = array[size];
             if (_clearOnFree)
             {
-                array[size] = default;     // Free memory quicker.
+                array[size] = default!;     // Free memory quicker.
             }
             return true;
         }
@@ -571,7 +571,7 @@ namespace Collections.Pooled
             throw new InvalidOperationException("Stack was empty.");
         }
 
-        private void ReturnArray(T[] replaceWith = null)
+        private void ReturnArray(T[]? replaceWith = null)
         {
             if (_array?.Length > 0)
             {
@@ -625,7 +625,7 @@ namespace Collections.Pooled
                 _stack = stack;
                 _version = stack._version;
                 _index = -2;
-                _currentElement = default;
+                _currentElement = default!;
             }
 
             public void Dispose()
@@ -654,7 +654,7 @@ namespace Collections.Pooled
                 if (retval)
                     _currentElement = _stack._array[_index];
                 else
-                    _currentElement = default;
+                    _currentElement = default!;
                 return retval;
             }
 
@@ -676,14 +676,14 @@ namespace Collections.Pooled
 
             object IEnumerator.Current
             {
-                get { return Current; }
+                get { return Current!; }
             }
 
             void IEnumerator.Reset()
             {
                 if (_version != _stack._version) throw new InvalidOperationException("Collection was modified during enumeration.");
                 _index = -2;
-                _currentElement = default;
+                _currentElement = default!;
             }
         }
     }

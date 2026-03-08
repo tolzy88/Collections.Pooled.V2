@@ -84,8 +84,8 @@ namespace Collections.Pooled
         // things will happen.
         // Alternatively, use the private properties Buckets and Slots, which slice the
         // arrays down to the correct length.
-        private int[] _buckets;
-        private Slot[] _slots;
+        private int[] _buckets = null!;
+        private Slot[] _slots = null!;
         private int _size;
 
         private int _count;
@@ -95,7 +95,7 @@ namespace Collections.Pooled
         private int _version;
         private readonly bool _clearOnFree;
 
-        private SerializationInfo _siInfo; // temporary variable needed during deserialization
+        private SerializationInfo? _siInfo; // temporary variable needed during deserialization
 
         #region Constructors
 
@@ -112,12 +112,12 @@ namespace Collections.Pooled
         /// <summary>
         /// Creates a new instance of PooledSet.
         /// </summary>
-        public PooledSet(IEqualityComparer<T> comparer) : this(ClearMode.Auto, comparer) { }
+        public PooledSet(IEqualityComparer<T>? comparer) : this(ClearMode.Auto, comparer) { }
 
         /// <summary>
         /// Creates a new instance of PooledSet.
         /// </summary>
-        public PooledSet(ClearMode clearMode, IEqualityComparer<T> comparer)
+        public PooledSet(ClearMode clearMode, IEqualityComparer<T>? comparer)
         {
             _comparer = comparer ?? EqualityComparer<T>.Default;
             _lastIndex = 0;
@@ -141,12 +141,12 @@ namespace Collections.Pooled
         /// <summary>
         /// Creates a new instance of PooledSet.
         /// </summary>
-        public PooledSet(int capacity, IEqualityComparer<T> comparer) : this(capacity, ClearMode.Auto, comparer) { }
+        public PooledSet(int capacity, IEqualityComparer<T>? comparer) : this(capacity, ClearMode.Auto, comparer) { }
 
         /// <summary>
         /// Creates a new instance of PooledSet.
         /// </summary>
-        public PooledSet(int capacity, ClearMode clearMode, IEqualityComparer<T> comparer) : this(clearMode, comparer)
+        public PooledSet(int capacity, ClearMode clearMode, IEqualityComparer<T>? comparer) : this(clearMode, comparer)
         {
             if (capacity < 0)
             {
@@ -178,7 +178,7 @@ namespace Collections.Pooled
         /// <summary>
         /// Creates a new instance of PooledSet.
         /// </summary>
-        public PooledSet(IEnumerable<T> collection, IEqualityComparer<T> comparer)
+        public PooledSet(IEnumerable<T> collection, IEqualityComparer<T>? comparer)
             : this(collection, ClearMode.Auto, comparer)
         { }
 
@@ -187,7 +187,7 @@ namespace Collections.Pooled
         /// Since resizes are relatively expensive (require rehashing), this attempts to minimize 
         /// the need to resize by setting the initial capacity based on size of collection. 
         /// </summary>
-        public PooledSet(IEnumerable<T> collection, ClearMode clearMode, IEqualityComparer<T> comparer) : this(clearMode, comparer)
+        public PooledSet(IEnumerable<T> collection, ClearMode clearMode, IEqualityComparer<T>? comparer) : this(clearMode, comparer)
         {
             if (collection == null)
             {
@@ -218,42 +218,42 @@ namespace Collections.Pooled
         /// <summary>
         /// Creates a new instance of PooledSet.
         /// </summary>
-        public PooledSet(T[] array) : this(array.AsSpan(), ClearMode.Auto, null) { }
+        public PooledSet(T[] array) : this(array.AsSpan(), ClearMode.Auto, null!) { }
 
         /// <summary>
         /// Creates a new instance of PooledSet.
         /// </summary>
-        public PooledSet(T[] array, ClearMode clearMode) : this(array.AsSpan(), clearMode, null) { }
+        public PooledSet(T[] array, ClearMode clearMode) : this(array.AsSpan(), clearMode, null!) { }
 
         /// <summary>
         /// Creates a new instance of PooledSet.
         /// </summary>
-        public PooledSet(T[] array, IEqualityComparer<T> comparer) : this(array.AsSpan(), ClearMode.Auto, comparer) { }
+        public PooledSet(T[] array, IEqualityComparer<T>? comparer) : this(array.AsSpan(), ClearMode.Auto, comparer) { }
 
         /// <summary>
         /// Creates a new instance of PooledSet.
         /// </summary>
-        public PooledSet(T[] array, ClearMode clearMode, IEqualityComparer<T> comparer) : this(array.AsSpan(), clearMode, comparer) { }
+        public PooledSet(T[] array, ClearMode clearMode, IEqualityComparer<T>? comparer) : this(array.AsSpan(), clearMode, comparer) { }
 
         /// <summary>
         /// Creates a new instance of PooledSet.
         /// </summary>
-        public PooledSet(ReadOnlySpan<T> span) : this(span, ClearMode.Auto, null) { }
+        public PooledSet(ReadOnlySpan<T> span) : this(span, ClearMode.Auto, null!) { }
 
         /// <summary>
         /// Creates a new instance of PooledSet.
         /// </summary>
-        public PooledSet(ReadOnlySpan<T> span, ClearMode clearMode) : this(span, clearMode, null) { }
+        public PooledSet(ReadOnlySpan<T> span, ClearMode clearMode) : this(span, clearMode, null!) { }
 
         /// <summary>
         /// Creates a new instance of PooledSet.
         /// </summary>
-        public PooledSet(ReadOnlySpan<T> span, IEqualityComparer<T> comparer) : this(span, ClearMode.Auto, comparer) { }
+        public PooledSet(ReadOnlySpan<T> span, IEqualityComparer<T>? comparer) : this(span, ClearMode.Auto, comparer) { }
 
         /// <summary>
         /// Creates a new instance of PooledSet.
         /// </summary>
-        public PooledSet(ReadOnlySpan<T> span, ClearMode clearMode, IEqualityComparer<T> comparer) : this(clearMode, comparer)
+        public PooledSet(ReadOnlySpan<T> span, ClearMode clearMode, IEqualityComparer<T>? comparer) : this(clearMode, comparer)
         {
             // to avoid excess resizes, first set size based on collection's count. Collection
             // may contain duplicates, so call TrimExcess if resulting hashset is larger than
@@ -275,6 +275,7 @@ namespace Collections.Pooled
         protected PooledSet(SerializationInfo info, StreamingContext context)
 #pragma warning restore IDE0060
         {
+            _comparer = EqualityComparer<T>.Default;
             // We can't do anything with the keys and values until the entire graph has been 
             // deserialized and we have a reasonable estimate that GetHashCode is not going to 
             // fail.  For the time being, we'll just cache this.  The graph is not valid until 
@@ -434,7 +435,7 @@ namespace Collections.Pooled
                         slots[i].hashCode = -1;
                         if (_clearOnFree)
                         {
-                            slots[i].value = default;
+                            slots[i].value = default!;
                         }
                         slots[i].next = _freeList;
 
@@ -562,10 +563,10 @@ namespace Collections.Pooled
             }
             else
             {
-                _buckets = null;
+                _buckets = null!;
             }
 
-            _version = _siInfo.GetInt32(VersionName);
+            _version = _siInfo!.GetInt32(VersionName);
             _siInfo = null;
         }
 
@@ -605,7 +606,7 @@ namespace Collections.Pooled
                     return true;
                 }
             }
-            actualValue = default;
+            actualValue = default!;
             return false;
         }
 
@@ -1783,8 +1784,8 @@ namespace Collections.Pooled
                 }
             }
 
-            _slots = null;
-            _buckets = null;
+            _slots = null!;
+            _buckets = null!;
         }
 
         private static bool ShouldClear(ClearMode mode)
@@ -1810,7 +1811,7 @@ namespace Collections.Pooled
             int bucket = hashCode % _size;
             int collisionCount = 0;
             Slot[] slots = _slots;
-            for (int i = _buckets[bucket] - 1; i >= 0; i = slots[i].next)
+            for (int i = _buckets![bucket] - 1; i >= 0; i = slots[i].next)
             {
                 if (slots[i].hashCode == hashCode && _comparer.Equals(slots[i].value, value))
                 {
@@ -2656,7 +2657,7 @@ namespace Collections.Pooled
                 _set = set;
                 _index = 0;
                 _version = set._version;
-                _current = default;
+                _current = default!;
             }
 
             void IDisposable.Dispose()
@@ -2684,7 +2685,7 @@ namespace Collections.Pooled
                     _index++;
                 }
                 _index = _set._lastIndex + 1;
-                _current = default;
+                _current = default!;
                 return false;
             }
 
@@ -2701,7 +2702,7 @@ namespace Collections.Pooled
                     {
                         ThrowHelper.ThrowInvalidOperationException_InvalidOperation_EnumOpCantHappen();
                     }
-                    return Current;
+                    return Current!;
                 }
             }
 
@@ -2713,7 +2714,7 @@ namespace Collections.Pooled
                 }
 
                 _index = 0;
-                _current = default;
+                _current = default!;
             }
         }
     }
