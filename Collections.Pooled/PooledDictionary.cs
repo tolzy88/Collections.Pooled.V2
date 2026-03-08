@@ -1389,7 +1389,7 @@ namespace Collections.Pooled
                 {
                     Interlocked.CompareExchange<object?>(ref _syncRoot, new object(), null);
                 }
-                return _syncRoot;
+                return _syncRoot!;
             }
         }
 
@@ -1421,7 +1421,7 @@ namespace Collections.Pooled
                 {
                     ThrowHelper.ThrowArgumentNullException(ExceptionArgument.key);
                 }
-                ThrowHelper.IfNullAndNullsAreIllegalThenThrow<TValue>(value!, ExceptionArgument.value);
+                ThrowHelper.IfNullAndNullsAreIllegalThenThrow<TValue>(value, ExceptionArgument.value);
 
                 try
                 {

@@ -239,7 +239,7 @@ namespace Collections.Pooled
                 {
                     Interlocked.CompareExchange<object?>(ref _syncRoot, new object(), null);
                 }
-                return _syncRoot;
+                return _syncRoot!;
             }
         }
 
