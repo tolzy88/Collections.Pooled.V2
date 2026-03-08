@@ -5,15 +5,15 @@
 // Used by Hashtable and Dictionary's SeralizationInfo .ctor's to store the SeralizationInfo
 // object until OnDeserialization is called.
 
-using System.Threading;
 using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
+using System.Threading;
 
 namespace Collections.Pooled
 {
     internal static partial class HashHelpers
-    {        
-        private static ConditionalWeakTable<object, SerializationInfo> s_serializationInfoTable;
+    {
+        private static ConditionalWeakTable<object, SerializationInfo>? s_serializationInfoTable;
 
         public static ConditionalWeakTable<object, SerializationInfo> SerializationInfoTable
         {

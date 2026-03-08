@@ -37,6 +37,7 @@
 	<IncludeContentInPack>true</IncludeContentInPack>
 	<GenerateDocumentationFile>true</GenerateDocumentationFile>
 	<IncludeSymbols>false</IncludeSymbols>
+	<Nullable>enable</Nullable>
 </PropertyGroup>
 
 </Project>
